@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pessoas - Sistema de Gestão de Igrejas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/styles/theme.css">
+  <link rel="stylesheet" href="assets/styles/dashboard.css">
+  <link rel="stylesheet" href="assets/styles/pessoas.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="https://via.placeholder.com/40x40?text=I" alt="Logo">
+          <span class="sidebar-logo-text">IGreja</span>
+        </div>
+        <button class="sidebar-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+      
+      <nav class="sidebar-menu">
+        <a href="dashboard.html" class="sidebar-menu-item">
+          <i class="fas fa-home sidebar-menu-icon"></i>
+          <span class="sidebar-menu-text">Dashboard</span>
+        </a>
+        <a href="pessoas.html" class="sidebar-menu-item active">
+          <i class="fas fa-users sidebar-menu-icon"></i>
+          <span class="sidebar-menu-text">Pessoas</span>
+        </a>
+        <a href="#" class="sidebar-menu-item">
+          <i class="fas fa-user-friends sidebar-menu-icon"></i>
+          <span class="sidebar-menu-text">Grupos/Células</span>
+        </a>
+        <a href="#" class="sidebar-menu-item">
+          <i class="fas fa-money-bill-wave sidebar-menu-icon"></i>
+          <span class="sidebar-menu-text">Financeiro</span>
+        </a>
+        <a href="#" class="sidebar-menu-item">
+          <i class="fas fa-boxes sidebar-menu-icon"></i>
+          <span class="sidebar-menu-text">Patrimônio</span>
+        </a>
+        <a href="#" class="sidebar-menu-item">
+          <i class="fas fa-calendar-alt sidebar-menu-icon"></i>
+          <span class="sidebar-menu-text">Agenda</span>
+        </a>
+        <a href="#" class="sidebar-menu-item">
+          <i class="fas fa-bullhorn sidebar-menu-icon"></i>
+          <span class="sidebar-menu-text">Mural</span>
+        </a>
+        <a href="#" class="sidebar-menu-item">
+          <i class="fas fa-cog sidebar-menu-icon"></i>
+          <span class="sidebar-menu-text">Configurações</span>
+        </a>
+      </nav>
+    </aside>
+    
+    <!-- Conteúdo principal -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="pessoas-header">
+        <h1 class="pessoas-title">Pessoas</h1>
+        
+        <div class="pessoas-actions">
+          <button class="btn btn-primary" id="btnNovaPessoa">
+            <i class="fas fa-plus"></i> Nova Pessoa
+          </button>
+        </div>
+      </header>
+      
+      <!-- Filtros -->
+      <div class="pessoas-filters">
+        <div class="filter-group">
+          <span class="filter-label">Função:</span>
+          <select class="filter-select">
+            <option value="">Todas</option>
+            <option value="membro">Membro</option>
+            <option value="pastor">Pastor</option>
+            <option value="lider">Líder</option>
+            <option value="voluntario">Voluntário</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <span class="filter-label">Grupo:</span>
+          <select class="filter-select">
+            <option value="">Todos</option>
+            <option value="jovens">Jovens</option>
+            <option value="adultos">Adultos</option>
+            <option value="louvor">Louvor</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <span class="filter-label">Status:</span>
+          <select class="filter-select">
+            <option value="">Todos</option>
+            <option value="ativo">Ativo</option>
+            <option value="inativo">Inativo</option>
+          </select>
+        </div>
+        
+        <div class="filter-search">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Buscar por nome, email ou telefone...">
+        </div>
+      </div>
+      
+      <!-- Lista de pessoas -->
+      <div class="pessoas-list">
+        <table class="pessoas-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Contato</th>
+              <th>Função</th>
+              <th>Grupo</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="pessoa-info">
+                  <div class="pessoa-avatar">
+                    <img src="https://via.placeholder.com/40x40" alt="João Silva">
+                  </div>
+                  <div>
+                    <div class="pessoa-nome">João Silva</div>
+                    <div class="pessoa-email">joao.silva@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td>(11) 98765-4321</td>
+              <td>Pastor</td>
+              <td>Louvor</td>
+              <td><span class="pessoa-status status-ativo">Ativo</span></td>
+              <td>
+                <div class="pessoa-actions">
+                  <button class="action-btn btn-editar" data-id="1">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="action-btn btn-visualizar" data-id="1">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="action-btn btn-excluir" data-id="1">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="pessoa-info">
+                  <div class="pessoa-avatar">
+                    <img src="https://via.placeholder.com/40x40" alt="Maria Oliveira">
+                  </div>
+                  <div>
+                    <div class="pessoa-nome">Maria Oliveira</div>
+                    <div class="pessoa-email">maria.oliveira@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td>(11) 91234-5678</td>
+              <td>Líder</td>
+              <td>Jovens</td>
+              <td><span class="pessoa-status status-ativo">Ativo</span></td>
+              <td>
+                <div class="pessoa-actions">
+                  <button class="action-btn btn-editar" data-id="2">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="action-btn btn-visualizar" data-id="2">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="action-btn btn-excluir" data-id="2">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="pessoa-info">
+                  <div class="pessoa-avatar">
+                    <img src="https://via.placeholder.com/40x40" alt="Pedro Santos">
+                  </div>
+                  <div>
+                    <div class="pessoa-nome">Pedro Santos</div>
+                    <div class="pessoa-email">pedro.santos@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td>(11) 99876-5432</td>
+              <td>Membro</td>
+              <td>Adultos</td>
+              <td><span class="pessoa-status status-ativo">Ativo</span></td>
+              <td>
+                <div class="pessoa-actions">
+                  <button class="action-btn btn-editar" data-id="3">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="action-btn btn-visualizar" data-id="3">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="action-btn btn-excluir" data-id="3">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="pessoa-info">
+                  <div class="pessoa-avatar">
+                    <img src="https://via.placeholder.com/40x40" alt="Ana Costa">
+                  </div>
+                  <div>
+                    <div class="pessoa-nome">Ana Costa</div>
+                    <div class="pessoa-email">ana.costa@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td>(11) 98765-1234</td>
+              <td>Voluntário</td>
+              <td>Louvor</td>
+              <td><span class="pessoa-status status-inativo">Inativo</span></td>
+              <td>
+                <div class="pessoa-actions">
+                  <button class="action-btn btn-editar" data-id="4">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="action-btn btn-visualizar" data-id="4">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="action-btn btn-excluir" data-id="4">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="pessoa-info">
+                  <div class="pessoa-avatar">
+                    <img src="https://via.placeholder.com/40x40" alt="Lucas Ferreira">
+                  </div>
+                  <div>
+                    <div class="pessoa-nome">Lucas Ferreira</div>
+                    <div class="pessoa-email">lucas.ferreira@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td>(11) 91234-9876</td>
+              <td>Membro</td>
+              <td>Jovens</td>
+              <td><span class="pessoa-status status-ativo">Ativo</span></td>
+              <td>
+                <div class="pessoa-actions">
+                  <button class="action-btn btn-editar" data-id="5">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="action-btn btn-visualizar" data-id="5">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="action-btn btn-excluir" data-id="5">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <!-- Paginação -->
+        <div class="pessoas-pagination">
+          <div class="pagination-info">
+            Mostrando 1-5 de 25 registros
+          </div>
+          <div class="pagination-controls">
+            <button class="pagination-btn" disabled>
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn">3</button>
+            <button class="pagination-btn">4</button>
+            <button class="pagination-btn">5</button>
+            <button class="pagination-btn">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Modal de cadastro/edição -->
+  <div class="modal-overlay" id="modalPessoa">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2 class="modal-title">Nova Pessoa</h2>
+        <button class="modal-close" id="btnFecharModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="formPessoa">
+          <div class="form-row">
+            <div class="form-col form-col-12">
+              <div class="form-group">
+                <label class="form-label" for="nome">Nome completo</label>
+                <input type="text" class="form-control" id="nome" required>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col form-col-4">
+              <div class="form-group">
+                <label class="form-label" for="dataNascimento">Data de nascimento</label>
+                <input type="date" class="form-control" id="dataNascimento">
+              </div>
+            </div>
+            <div class="form-col form-col-4">
+              <div class="form-group">
+                <label class="form-label" for="genero">Gênero</label>
+                <select class="form-control" id="genero">
+                  <option value="">Selecione</option>
+                  <option value="masculino">Masculino</option>
+                  <option value="feminino">Feminino</option>
+                  <option value="outro">Outro</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-col form-col-4">
+              <div class="form-group">
+                <label class="form-label" for="estadoCivil">Estado civil</label>
+                <select class="form-control" id="estadoCivil">
+                  <option value="">Selecione</option>
+                  <option value="solteiro">Solteiro(a)</option>
+                  <option value="casado">Casado(a)</option>
+                  <option value="divorciado">Divorciado(a)</option>
+                  <option value="viuvo">Viúvo(a)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col form-col-6">
+              <div class="form-group">
+                <label class="form-label" for="email">E-mail</label>
+                <input type="email" class="form-control" id="email">
+              </div>
+            </div>
+            <div class="form-col form-col-6">
+              <div class="form-group">
+                <label class="form-label" for="telefone">Telefone</label>
+                <input type="tel" class="form-control" id="telefone">
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col form-col-6">
+              <div class="form-group">
+                <label class="form-label" for="endereco">Endereço</label>
+                <input type="text" class="form-control" id="endereco">
+              </div>
+            </div>
+            <div class="form-col form-col-3">
+              <div class="form-group">
+                <label class="form-label" for="numero">Número</label>
+                <input type="text" class="form-control" id="numero">
+              </div>
+            </div>
+            <div class="form-col form-col-3">
+              <div class="form-group">
+                <label class="form-label" for="complemento">Complemento</label>
+                <input type="text" class="form-control" id="complemento">
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col form-col-4">
+              <div class="form-group">
+                <label class="form-label" for="bairro">Bairro</label>
+                <input type="text" class="form-control" id="bairro">
+              </div>
+            </div>
+            <div class="form-col form-col-4">
+              <div class="form-group">
+                <label class="form-label" for="cidade">Cidade</label>
+                <input type="text" class="form-control" id="cidade">
+              </div>
+            </div>
+            <div class="form-col form-col-4">
+              <div class="form-group">
+                <label class="form-label" for="estado">Estado</label>
+                <select class="form-control" id="estado">
+                  <option value="">Selecione</option>
+                  <option value="AC">AC</option>
+                  <option value="AL">AL</option>
+                  <option value="AP">AP</option>
+                  <option value="AM">AM</option>
+                  <option value="BA">BA</option>
+                  <option value="CE">CE</option>
+                  <option value="DF">DF</option>
+                  <option value="ES">ES</option>
+                  <option value="GO">GO</option>
+                  <option value="MA">MA</option>
+                  <option value="MT">MT</option>
+                  <option value="MS">MS</option>
+                  <option value="MG">MG</option>
+                  <option value="PA">PA</option>
+                  <option value="PB">PB</option>
+                  <option value="PR">PR</option>
+                  <option value="PE">PE</option>
+                  <option value="PI">PI</option>
+                  <option value="RJ">RJ</option>
+                  <option value="RN">RN</option>
+                  <option value="RS">RS</option>
+                  <option value="RO">RO</option>
+                  <option value="RR">RR</option>
+                  <option value="SC">SC</option>
+                  <option value="SP">SP</option>
+                  <option value="SE">SE</option>
+                  <option value="TO">TO</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col form-col-6">
+              <div class="form-group">
+                <label class="form-label" for="funcao">Função/cargo</label>
+                <select class="form-control" id="funcao">
+                  <option value="">Selecione</option>
+                  <option value="pastor">Pastor</option>
+                  <option value="lider">Líder</option>
+                  <option value="membro">Membro</option>
+                  <option value="voluntario">Voluntário</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-col form-col-6">
+              <div class="form-group">
+                <label class="form-label" for="grupo">Grupo vinculado</label>
+                <select class="form-control" id="grupo">
+                  <option value="">Selecione</option>
+                  <option value="jovens">Jovens</option>
+                  <option value="adultos">Adultos</option>
+                  <option value="louvor">Louvor</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col form-col-6">
+              <div class="form-group">
+                <label class="form-label" for="dataIngresso">Data de ingresso</label>
+                <input type="date" class="form-control" id="dataIngresso">
+              </div>
+            </div>
+            <div class="form-col form-col-6">
+              <div class="form-group">
+                <label class="form-label" for="foto">Foto de perfil</label>
+                <input type="file" class="form-control" id="foto">
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col form-col-12">
+              <div class="form-group">
+                <label class="form-check">
+                  <input type="checkbox" id="batizado">
+                  <span class="form-check-label">Batizado</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btnCancelar">Cancelar</button>
+        <button class="btn btn-primary" id="btnSalvar">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle sidebar
+    document.querySelector('.sidebar-toggle').addEventListener('click', function() {
+      document.querySelector('.sidebar').classList.toggle('sidebar-collapsed');
+    });
+    
+    // Modal de cadastro/edição
+    const modalPessoa = document.getElementById('modalPessoa');
+    const btnNovaPessoa = document.getElementById('btnNovaPessoa');
+    const btnFecharModal = document.getElementById('btnFecharModal');
+    const btnCancelar = document.getElementById('btnCancelar');
+    const btnSalvar = document.getElementById('btnSalvar');
+    const formPessoa = document.getElementById('formPessoa');
+    
+    // Abrir modal
+    btnNovaPessoa.addEventListener('click', function() {
+      modalPessoa.classList.add('active');
+      document.querySelector('.modal-title').textContent = 'Nova Pessoa';
+      formPessoa.reset();
+    });
+    
+    // Fechar modal
+    btnFecharModal.addEventListener('click', function() {
+      modalPessoa.classList.remove('active');
+    });
+    
+    btnCancelar.addEventListener('click', function() {
+      modalPessoa.classList.remove('active');
+    });
+    
+    // Botões de editar
+    document.querySelectorAll('.btn-editar').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        modalPessoa.classList.add('active');
+        document.querySelector('.modal-title').textContent = 'Editar Pessoa';
+        
+        // Aqui seria feita uma requisição para buscar os dados da pessoa
+        // Por enquanto, vamos simular com dados estáticos
+        if (id === '1') {
+          document.getElementById('nome').value = 'João Silva';
+          document.getElementById('email').value = 'joao.silva@email.com';
+          document.getElementById('telefone').value = '(11) 98765-4321';
+          document.getElementById('funcao').value = 'pastor';
+          document.getElementById('grupo').value = 'louvor';
+        }
+      });
+    });
+    
+    // Botões de visualizar
+    document.querySelectorAll('.btn-visualizar').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        alert('Visualizar pessoa ID: ' + id);
+        // Aqui seria implementada a visualização detalhada
+      });
+    });
+    
+    // Botões de excluir
+    document.querySelectorAll('.btn-excluir').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        if (confirm('Tem certeza que deseja excluir esta pessoa?')) {
+          alert('Pessoa ID: ' + id + ' excluída com sucesso!');
+          // Aqui seria implementada a exclusão
+        }
+      });
+    });
+    
+    // Salvar formulário
+    btnSalvar.addEventListener('click', function() {
+      if (formPessoa.checkValidity()) {
+        alert('Pessoa salva com sucesso!');
+        modalPessoa.classList.remove('active');
+        // Aqui seria implementado o salvamento dos dados
+      } else {
+        formPessoa.reportValidity();
+      }
+    });
+  </script>
+</body>
+</html>

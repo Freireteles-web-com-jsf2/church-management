@@ -1,0 +1,103 @@
+/* Estilos específicos para a página de login */
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--primary-very-light);
+  background-image: linear-gradient(135deg, var(--primary-very-light) 0%, var(--white) 100%);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  background-color: var(--white);
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.login-logo img {
+  max-width: 120px;
+  height: auto;
+}
+
+.login-title {
+  font-size: 1.75rem;
+  text-align: center;
+  color: var(--primary-dark);
+  margin-bottom: var(--spacing-lg);
+}
+
+.login-form .form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.login-form .form-control {
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  font-size: 1rem;
+}
+
+.login-form .btn {
+  width: 100%;
+  padding: var(--spacing-md);
+  font-size: 1rem;
+  border-radius: var(--border-radius-md);
+  margin-top: var(--spacing-md);
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: var(--spacing-xl);
+}
+
+.login-footer a {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  margin: var(--spacing-lg) 0;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid var(--gray);
+}
+
+.login-divider span {
+  padding: 0 var(--spacing-md);
+  color: var(--gray-dark);
+  font-size: 0.875rem;
+}
+
+/* Animação suave */
+.login-card {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Sistema de Gestão de Igrejas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/styles/theme.css">
+  <link rel="stylesheet" href="assets/styles/dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="https://via.placeholder.com/40x40?text=I" alt="Logo">
+          <span class="sidebar-logo-text">IGreja</span>
+        </div>
+        <button class="sidebar-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+      
+      <nav class="sidebar-menu">
+        <a href="#" class="sidebar-menu-item active">
+          <i class="fas fa-home sidebar-menu-icon"></i>
+          <span class="sidebar-menu-text">Dashboard</span>
+        </a>
+        <a href="#" class="sidebar-menu-item">
+          <i class="fas fa-users sidebar-menu-icon"></i>
+          <span class="sidebar-menu-text">Pessoas</span>
+        </a>
+        <a href="#" class="sidebar-menu-item">
+          <i class="fas fa-user-friends sidebar-menu-icon"></i>
+          <span class="sidebar-menu-text">Grupos/Células</span>
+        </a>
+        <a href="#" class="sidebar-menu-item">
+          <i class="fas fa-money-bill-wave sidebar-menu-icon"></i>
+          <span class="sidebar-menu-text">Financeiro</span>
+        </a>
+        <a href="#" class="sidebar-menu-item">
+          <i class="fas fa-boxes sidebar-menu-icon"></i>
+          <span class="sidebar-menu-text">Patrimônio</span>
+        </a>
+        <a href="#" class="sidebar-menu-item">
+          <i class="fas fa-calendar-alt sidebar-menu-icon"></i>
+          <span class="sidebar-menu-text">Agenda</span>
+        </a>
+        <a href="#" class="sidebar-menu-item">
+          <i class="fas fa-bullhorn sidebar-menu-icon"></i>
+          <span class="sidebar-menu-text">Mural</span>
+        </a>
+        <a href="#" class="sidebar-menu-item">
+          <i class="fas fa-cog sidebar-menu-icon"></i>
+          <span class="sidebar-menu-text">Configurações</span>
+        </a>
+      </nav>
+    </aside>
+    
+    <!-- Conteúdo principal -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <h1 class="page-title">Dashboard</h1>
+        
+        <div class="header-actions">
+          <div class="header-search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Pesquisar...">
+          </div>
+          
+          <div class="user-menu">
+            <div class="user-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <span>Pastor Silva</span>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Cards de estatísticas -->
+      <div class="dashboard-stats">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">248</div>
+            <div class="stat-label">Membros ativos</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-user-friends"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">12</div>
+            <div class="stat-label">Grupos ativos</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-money-bill-wave"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">R$ 15.480</div>
+            <div class="stat-label">Receitas do mês</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-calendar-day"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">5</div>
+            <div class="stat-label">Aniversariantes hoje</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Gráficos -->
+      <div class="dashboard-charts">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h2 class="chart-title">Movimentação Financeira</h2>
+            <div class="chart-actions">
+              <button><i class="fas fa-download"></i></button>
+              <button><i class="fas fa-ellipsis-v"></i></button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="financialChart"></canvas>
+          </div>
+        </div>
+        
+        <div class="chart-card">
+          <div class="chart-header">
+            <h2 class="chart-title">Distribuição de Membros</h2>
+            <div class="chart-actions">
+              <button><i class="fas fa-download"></i></button>
+              <button><i class="fas fa-ellipsis-v"></i></button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="membersChart"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Próximos eventos -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Próximos Eventos</h2>
+          <a href="#" class="btn btn-outline">Ver todos</a>
+        </div>
+        
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Evento</th>
+              <th>Data</th>
+              <th>Horário</th>
+              <th>Local</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Culto de Domingo</td>
+              <td>18/07/2025</td>
+              <td>19:00</td>
+              <td>Templo Principal</td>
+              <td><a href="#"><i class="fas fa-eye"></i></a></td>
+            </tr>
+            <tr>
+              <td>Reunião de Líderes</td>
+              <td>20/07/2025</td>
+              <td>20:00</td>
+              <td>Sala de Reuniões</td>
+              <td><a href="#"><i class="fas fa-eye"></i></a></td>
+            </tr>
+            <tr>
+              <td>Grupo de Jovens</td>
+              <td>21/07/2025</td>
+              <td>19:30</td>
+              <td>Salão Social</td>
+              <td><a href="#"><i class="fas fa-eye"></i></a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Aniversariantes -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Aniversariantes do Mês</h2>
+          <a href="#" class="btn btn-outline">Ver todos</a>
+        </div>
+        
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Data</th>
+              <th>Idade</th>
+              <th>Contato</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Maria Silva</td>
+              <td>16/07/2025</td>
+              <td>35 anos</td>
+              <td>(11) 98765-4321</td>
+              <td><a href="#"><i class="fas fa-envelope"></i></a></td>
+            </tr>
+            <tr>
+              <td>João Santos</td>
+              <td>18/07/2025</td>
+              <td>42 anos</td>
+              <td>(11) 91234-5678</td>
+              <td><a href="#"><i class="fas fa-envelope"></i></a></td>
+            </tr>
+            <tr>
+              <td>Ana Oliveira</td>
+              <td>25/07/2025</td>
+              <td>28 anos</td>
+              <td>(11) 99876-5432</td>
+              <td><a href="#"><i class="fas fa-envelope"></i></a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Toggle sidebar
+    document.querySelector('.sidebar-toggle').addEventListener('click', function() {
+      document.querySelector('.sidebar').classList.toggle('sidebar-collapsed');
+    });
+    
+    // Gráfico financeiro
+    const financialCtx = document.getElementById('financialChart').getContext('2d');
+    const financialChart = new Chart(financialCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+        datasets: [
+          {
+            label: 'Receitas',
+            data: [12500, 13200, 14800, 13900, 15200, 15480],
+            backgroundColor: '#4A90E2',
+          },
+          {
+            label: 'Despesas',
+            data: [10800, 11500, 12200, 11800, 12500, 13100],
+            backgroundColor: '#E74C3C',
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return 'R$ ' + value;
+              }
+            }
+          }
+        }
+      }
+    });
+    
+    // Gráfico de membros
+    const membersCtx = document.getElementById('membersChart').getContext('2d');
+    const membersChart = new Chart(membersCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Adultos', 'Jovens', 'Adolescentes', 'Crianças'],
+        datasets: [{
+          data: [120, 68, 34, 26],
+          backgroundColor: ['#4A90E2', '#5DADE2', '#85C1E9', '#AED6F1'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

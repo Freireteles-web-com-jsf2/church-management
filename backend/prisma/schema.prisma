@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Pessoa {
+  id                 String   @id @default(uuid())
+  nome               String
+  dataNascimento     DateTime
+  genero             String
+  estadoCivil        String
+  email              String   @unique
+  telefone           String
+  endereco           String
+  numero             String
+  complemento        String?
+  bairro             String
+  cidade             String
+  estado             String
+  funcao             String
+  grupoId            String?
+  grupo              Grupo?   @relation(fields: [grupoId], references: [id])
+  fotoUrl            String?
+  dataIngresso       DateTime
+  batizado           Boolean
+  camposPersonalizados Json?
+}
+
+model Grupo {
+  id            String   @id @default(uuid())
+  nome          String
+  categoria     String
+  endereco      String
+  lideres       String   // JSON string array
+  dataHoraReuniao DateTime
+  status        String
+  observacoes   String?
+  pessoas       Pessoa[]
+}
+
+model LancamentoFinanceiro {
+  id               String   @id @default(uuid())
+  tipo             String
+  valor            Float
+  data             DateTime
+  categoria        String
+  pessoaFornecedor String
+  formaPagamento   String
+  observacoes      String?
+  anexoUrl         String?
+}
+
+model Patrimonio {
+  id            String   @id @default(uuid())
+  nome          String
+  categoria     String
+  localizacao   String
+  valorEstimado Float
+  dataAquisicao DateTime
+  situacao      String
+  anotacoes     String?
+  anexoUrl      String?
+}
+
+model Evento {
+  id                   String   @id @default(uuid())
+  titulo               String
+  dataHora             DateTime
+  recorrencia          String
+  notificacoesAtivadas Boolean
+  descricao            String?
+}
+
+model MensagemMural {
+  id                String   @id @default(uuid())
+  titulo            String
+  mensagem          String
+  visibilidade      String
+  gruposEspecificos String   // JSON string array
+}
+
+model Perfil {
+  id          String   @id @default(uuid())
+  nome        String
+  permissoes  Permissao[]
+}
+
+model Permissao {
+  id        String   @id @default(uuid())
+  nome      String
+  descricao String?
+  perfilId  String
+  perfil    Perfil   @relation(fields: [perfilId], references: [id])
+} 

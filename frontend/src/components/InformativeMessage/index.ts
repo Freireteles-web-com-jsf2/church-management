@@ -1,0 +1,1 @@
+export { InformativeMessage, type MessageType } from './InformativeMessage';
