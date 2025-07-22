@@ -1,69 +1,40 @@
-# React + TypeScript + Vite
+# Dashboard - Church Management
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Visão Geral
+O dashboard oferece uma visão centralizada das principais informações da igreja, incluindo estatísticas, eventos, aniversariantes, finanças e atividades recentes. É responsivo, acessível e personalizável para diferentes perfis de usuário.
 
-Currently, two official plugins are available:
+## Como Acessar e Navegar
+- Acesse pelo menu principal após login.
+- Navegue entre widgets usando swipe (mobile) ou drag-and-drop (desktop).
+- Use o menu lateral para acessar outras áreas do sistema.
+- Atualize os dados com pull-to-refresh (mobile) ou botão de atualizar.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Permissões e Roles de Usuário
+- **Admin:** Acesso total a todos os widgets e configurações.
+- **Tesoureiro:** Foco em finanças e estatísticas.
+- **Líder/Pastor:** Foco em membros, grupos e eventos.
+- **Membro/Voluntário:** Acesso restrito a informações essenciais.
 
-## Expanding the ESLint configuration
+## Personalização
+- Reordene widgets arrastando (desktop) ou navegando por swipe (mobile).
+- Salve sua configuração de layout.
+- Restaure o layout padrão a qualquer momento.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Gráficos e Tabelas
+- Gráficos interativos com suporte a zoom e pan.
+- Tabelas com rolagem horizontal em mobile.
+- Estados vazios e mensagens informativas quando não há dados.
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Acessibilidade
+- Navegação por teclado suportada.
+- ARIA labels e roles aplicados.
+- Foco visível e contraste adequado.
+- Compatível com leitores de tela.
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## FAQ e Dicas
+- **Como atualizar os dados?** Use o botão de atualizar ou puxe para baixo no mobile.
+- **Como personalizar o dashboard?** Arraste widgets ou use swipe para navegar.
+- **Problemas de acesso?** Verifique suas permissões ou entre em contato com o administrador.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+Para dúvidas ou sugestões, consulte a equipe de suporte ou a documentação completa do sistema.

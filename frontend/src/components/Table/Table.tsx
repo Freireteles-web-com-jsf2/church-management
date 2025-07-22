@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { theme } from '../../styles/theme';
+import { FixedSizeList as List } from 'react-window';
 
 export interface Column<T> {
   header: string | React.ReactNode;
@@ -252,28 +253,55 @@ export function Table<T>({
             ))}
           </TableRow>
         </TableHead>
-        
         <TableBody>
-          {data.length > 0 ? (
-            data.map((item) => (
-              <TableRow 
-                key={keyExtractor(item)}
-                clickable={!!onRowClick}
-                onClick={() => onRowClick && onRowClick(item)}
-              >
-                {columns.map((column, index) => (
-                  <TableCell key={index} align={column.align}>
-                    {renderCell(item, column)}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
+          {data.length > 50 ? (
+            <List
+              height={400}
+              itemCount={data.length}
+              itemSize={48}
+              width="100%"
+              style={{ width: '100%' }}
+            >
+              {({ index, style }) => {
+                const item = data[index];
+                return (
+                  <TableRow 
+                    key={keyExtractor(item)}
+                    clickable={!!onRowClick}
+                    onClick={() => onRowClick && onRowClick(item)}
+                    style={style}
+                  >
+                    {columns.map((column, colIndex) => (
+                      <TableCell key={colIndex} align={column.align}>
+                        {renderCell(item, column)}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              }}
+            </List>
           ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length}>
-                <EmptyState>{emptyMessage}</EmptyState>
-              </TableCell>
-            </TableRow>
+            data.length > 0 ? (
+              data.map((item) => (
+                <TableRow 
+                  key={keyExtractor(item)}
+                  clickable={!!onRowClick}
+                  onClick={() => onRowClick && onRowClick(item)}
+                >
+                  {columns.map((column, index) => (
+                    <TableCell key={index} align={column.align}>
+                      {renderCell(item, column)}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length}>
+                  <EmptyState>{emptyMessage}</EmptyState>
+                </TableCell>
+              </TableRow>
+            )
           )}
         </TableBody>
       </StyledTable>

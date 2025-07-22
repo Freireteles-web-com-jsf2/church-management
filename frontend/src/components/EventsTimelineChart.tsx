@@ -3,6 +3,7 @@ import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, CartesianGrid } fro
 import styled from 'styled-components';
 import { theme } from '../styles/theme';
 import { EmptyState } from './EmptyState';
+// Remover import e uso de TransformWrapper/TransformComponent
 
 export interface TimelineEvent {
   id: string | number;
@@ -74,10 +75,10 @@ export const EventsTimelineChart: React.FC<Props> = ({ events }) => {
         <BarChart data={visible} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
-          <Tooltip formatter={(value, name, props) => props.payload?.name} labelFormatter={label => `Data: ${label}`} />
+          <Tooltip formatter={(_, name, props) => props.payload?.name} labelFormatter={label => `Data: ${label}`} />
           <Bar dataKey="important" name="Evento" fill={theme.colors.info}
             isAnimationActive={true}
-            shape={props => {
+            shape={(props: any) => {
               const { x, y, width, height, payload } = props;
               return (
                 <rect

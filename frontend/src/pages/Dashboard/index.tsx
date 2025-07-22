@@ -29,6 +29,9 @@ import { UpcomingEventsTable } from '../../components/UpcomingEventsTable';
 import { BirthdayTable } from '../../components/BirthdayTable';
 import { RecentActivitiesTable } from '../../components/RecentActivitiesTable';
 import { ErrorBoundary } from '../../components/ErrorBoundary';
+import { useSwipeable } from 'react-swipeable';
+import PullToRefresh from 'react-pull-to-refresh';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 
 // Interface para tipagem dos dados do dashboard
 interface DashboardStats {
@@ -104,6 +107,11 @@ const DashboardContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.lg};
+  padding: 0 16px;
+  @media (max-width: ${theme.breakpoints.md}) {
+    gap: ${theme.spacing.md};
+    padding: 0 4px;
+  }
 `;
 
 const StatsGrid = styled.div`
@@ -136,7 +144,13 @@ const StatCard = styled(ClickableCard)`
   display: flex;
   align-items: center;
   transition: transform ${theme.transitions.normal};
-  
+  min-height: 80px;
+  padding: 16px 12px;
+  @media (max-width: ${theme.breakpoints.sm}) {
+    min-height: 64px;
+    padding: 12px 6px;
+    font-size: 0.95em;
+  }
   &:hover {
     transform: translateY(-2px);
     box-shadow: ${theme.shadows.lg};
@@ -193,7 +207,46 @@ const TableGrid = styled.div`
   }
 `;
 
+// Adicionar rolagem horizontal suave para tabelas em mobile
+const TableWrapper = styled.div`
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  @media (max-width: ${theme.breakpoints.md}) {
+    margin-bottom: 12px;
+  }
+`;
+
 // Removidos EventTable e Badge pois não estão sendo utilizados
+
+// Adicionar efeito de toque highlight nos botões e cards
+const TouchButton = styled.button`
+  background: ${theme.colors.primary};
+  color: white;
+  border: none;
+  border-radius: ${theme.borderRadius.sm};
+  padding: 10px 18px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  &:active {
+    background: ${theme.colors.primaryDark};
+    box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+  }
+  &:focus {
+    outline: 2px solid ${theme.colors.info};
+  }
+`;
+
+const HighlightCard = styled(ClickableCard)`
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s, background 0.2s;
+  &:active {
+    background: ${theme.colors.primaryVeryLight};
+    box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+  }
+`;
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
@@ -382,6 +435,48 @@ const DashboardPage: React.FC = () => {
     );
   }
 
+  // Função utilitária para converter RecentActivity para Activity
+  function mapRecentActivityToActivity(activity: RecentActivity): any /* Activity */ {
+    return {
+      id: activity.id,
+      type: 'other', // ou mapear conforme necessário
+      description: activity.description || activity.title,
+      timestamp: typeof activity.timestamp === 'string' ? activity.timestamp : activity.timestamp.toString(),
+      user: {
+        id: activity.relatedId,
+        name: activity.title,
+        avatar: undefined,
+      },
+      module: 'outros',
+      entityId: activity.relatedId,
+      entityType: activity.type,
+      entityName: activity.title,
+    };
+  }
+
+  // Dentro do DashboardPage, adicionar estado para widget visível em mobile
+  const [mobileWidgetIndex, setMobileWidgetIndex] = useState(0);
+  const isMobile = window.innerWidth <= parseInt(theme.breakpoints.md);
+
+  // Função para avançar/retroceder widgets
+  const handleSwipe = (dir: 'left' | 'right') => {
+    if (!isMobile) return;
+    if (dir === 'left') {
+      setMobileWidgetIndex((prev) => Math.min(prev + 1, widgetOrder.length - 1));
+    } else {
+      setMobileWidgetIndex((prev) => Math.max(prev - 1, 0));
+    }
+  };
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => handleSwipe('left'),
+    onSwipedRight: () => handleSwipe('right'),
+    trackMouse: true,
+  });
+
+  // Dentro do DashboardPage, ajustar widgets exibidos em mobile para versão simplificada
+  const essentialWidgetsMobile: Array<'stats' | 'events'> = ['stats', 'events'];
+
   return (
     <ErrorBoundary>
       <DashboardContext.Provider value={{ dashboardData, loading, error, lastUpdate, refetch }}>
@@ -439,7 +534,7 @@ const DashboardPage: React.FC = () => {
                 </p>
               </div>
               <div>
-                <button 
+                <TouchButton 
                   onClick={handleResetLayout} 
                   style={{ 
                     background: theme.colors.primary,
@@ -451,160 +546,361 @@ const DashboardPage: React.FC = () => {
                   }}
                 >
                   Resetar layout padrão
-                </button>
+                </TouchButton>
               </div>
             </div>
-            <DragDropContext onDragEnd={handleDragEnd}>
-              <Droppable droppableId="dashboard-widgets" direction="vertical">
-                {(provided: DroppableProvided) => (
-                  <div ref={provided.innerRef} {...provided.droppableProps}>
-                    {widgetOrder.map((widget, idx) => (
-                      <Draggable key={widget} draggableId={widget} index={idx}>
-                        {(dragProvided: DraggableProvided) => (
-                          <div
-                            ref={dragProvided.innerRef}
-                            {...dragProvided.draggableProps}
-                            {...dragProvided.dragHandleProps}
-                            style={{ marginBottom: 24, ...dragProvided.draggableProps.style }}
-                          >
-                            {widget === 'notifications' && widgets.includes('notifications') && <NotificationWidget />}
-                            {widget === 'stats' && widgets.includes('stats') && (
-                              <>
-                                {/* Widgets específicos por função */}
-                                {userRole === 'admin' && <AdminWidget />}
-                                {userRole === 'pastor' && <PastorWidget />}
-                                {userRole === 'membro' && <MemberInfoWidget />}
-                                {userRole === 'voluntario' && <VolunteerWidget />}
-                                
-                                <StatsGrid>
-                                  <StatCard onClick={() => window.location.href = '/pessoas'} title="Clique para ver todos os membros">
-                                    <StatIcon bgColor={theme.colors.primary} aria-label="Membros ativos">👥</StatIcon>
-                                    <StatContent>
-                                      <StatValue>{stats.pessoasAtivas ?? '-'}</StatValue>
-                                      <StatLabel>Membros ativos</StatLabel>
-                                    </StatContent>
-                                  </StatCard>
-                                  <StatCard onClick={() => window.location.href = '/grupos'} title="Clique para ver todos os grupos">
-                                    <StatIcon bgColor={theme.colors.info} aria-label="Grupos ativos">👨‍👩‍👧‍👦</StatIcon>
-                                    <StatContent>
-                                      <StatValue>{stats.gruposAtivos ?? '-'}</StatValue>
-                                      <StatLabel>Grupos ativos</StatLabel>
-                                    </StatContent>
-                                  </StatCard>
-                                  <StatCard onClick={() => window.location.href = '/financeiro'} title="Clique para ver movimentação financeira">
-                                    <StatIcon bgColor={theme.colors.success} aria-label="Receitas do mês">💰</StatIcon>
-                                    <StatContent>
-                                      <StatValue>R$ {stats.receitasMes?.toLocaleString('pt-BR') ?? '-'}</StatValue>
-                                      <StatLabel>Receitas do mês</StatLabel>
-                                    </StatContent>
-                                  </StatCard>
-                                  <StatCard onClick={() => window.location.href = '/pessoas?filter=birthdays'} title="Clique para ver aniversariantes">
-                                    <StatIcon bgColor={theme.colors.warning} aria-label="Aniversariantes hoje">🎂</StatIcon>
-                                    <StatContent>
-                                      <StatValue>{stats.aniversariantesHoje ?? '-'}</StatValue>
-                                      <StatLabel>Aniversariantes hoje</StatLabel>
-                                    </StatContent>
-                                  </StatCard>
-                                </StatsGrid>
-                              </>
-                            )}
-                            {widget === 'finance' && widgets.includes('finance') && (
-                              <>
-                                {/* Widget especializado para tesoureiro */}
-                                {userRole === 'tesoureiro' && <TreasurerWidget />}
-                                
-                                <ChartsGrid>
-                                  <Card>
-                                    <CardHeader>
-                                      <h3>Movimentação Financeira</h3>
-                                      <select value={period} onChange={e => setPeriod(e.target.value as any)} style={{ marginLeft: 16 }}>
-                                        <option value="month">Mensal</option>
-                                        <option value="quarter">Trimestral</option>
-                                        <option value="year">Anual</option>
-                                      </select>
-                                    </CardHeader>
-                                    <CardBody>
-                                      {financialData.length === 0 ? (
-                                        <EmptyState
-                                          icon="💰"
-                                          title="Nenhum dado financeiro disponível"
-                                          description="Adicione lançamentos de receitas e despesas para acompanhar o fluxo financeiro da igreja e tomar decisões baseadas em dados."
-                                          actionText="Ir para Financeiro"
-                                          actionLink="/financeiro"
-                                        />
-                                      ) : (
-                                        <ResponsiveContainer width="100%" height={300}>
-                                          <BarChart data={financialData} onClick={data => setDrilldownData(data.activePayload?.[0]?.payload)}>
-                                            <CartesianGrid strokeDasharray="3 3" />
-                                            <XAxis dataKey="month" />
-                                            <YAxis />
-                                            <Tooltip formatter={(value) => `R$ ${value}`} />
-                                            <Legend />
-                                            <Bar dataKey="receitas" name="Receitas" fill={theme.colors.primary} />
-                                            <Bar dataKey="despesas" name="Despesas" fill={theme.colors.danger} />
-                                          </BarChart>
-                                        </ResponsiveContainer>
-                                      )}
-                                      {drilldownData && (
-                                        <div style={{ marginTop: 16, background: theme.colors.grayLight, padding: 16, borderRadius: 8 }}>
-                                          <b>Detalhes de {drilldownData.month}:</b><br />
-                                          Receitas: R$ {drilldownData.receitas?.toLocaleString('pt-BR')}<br />
-                                          Despesas: R$ {drilldownData.despesas?.toLocaleString('pt-BR')}<br />
-                                          Saldo: R$ {drilldownData.saldo?.toLocaleString('pt-BR')}<br />
-                                          <button onClick={() => setDrilldownData(null)} style={{ marginTop: 8 }}>Fechar</button>
+            {/* Renderização dos widgets: em mobile, mostrar um por vez com swipe; em desktop, todos */}
+            {isMobile ? (
+              <PullToRefresh onRefresh={refetch} style={{ minHeight: '100vh' }}>
+                <div {...swipeHandlers} style={{ width: '100%', overflow: 'hidden', minHeight: 320 }}>
+                  {widgetOrder
+                    .filter(widget => essentialWidgetsMobile.includes(widget as any))
+                    .map((widget, idx) => (
+                      <div
+                        key={widget}
+                        style={{
+                          display: idx === mobileWidgetIndex ? 'block' : 'none',
+                          transition: 'all 0.3s',
+                        }}
+                      >
+                        {widget === 'notifications' && widgets.includes('notifications') && <NotificationWidget />}
+                        {widget === 'stats' && widgets.includes('stats') && (
+                          <>
+                            {userRole === 'admin' && <AdminWidget />}
+                            {userRole === 'pastor' && <PastorWidget />}
+                            {userRole === 'membro' && <MemberInfoWidget />}
+                            {userRole === 'voluntario' && <VolunteerWidget />}
+                            <StatsGrid>
+                              <HighlightCard onClick={() => window.location.href = '/pessoas'} title="Clique para ver todos os membros">
+                                <StatIcon bgColor={theme.colors.primary} aria-label="Membros ativos">👥</StatIcon>
+                                <StatContent>
+                                  <StatValue>{stats.pessoasAtivas ?? '-'}</StatValue>
+                                  <StatLabel>Membros ativos</StatLabel>
+                                </StatContent>
+                              </HighlightCard>
+                              <HighlightCard onClick={() => window.location.href = '/grupos'} title="Clique para ver todos os grupos">
+                                <StatIcon bgColor={theme.colors.info} aria-label="Grupos ativos">👨‍👩‍👧‍👦</StatIcon>
+                                <StatContent>
+                                  <StatValue>{stats.gruposAtivos ?? '-'}</StatValue>
+                                  <StatLabel>Grupos ativos</StatLabel>
+                                </StatContent>
+                              </HighlightCard>
+                              <HighlightCard onClick={() => window.location.href = '/financeiro'} title="Clique para ver movimentação financeira">
+                                <StatIcon bgColor={theme.colors.success} aria-label="Receitas do mês">💰</StatIcon>
+                                <StatContent>
+                                  <StatValue>R$ {stats.receitasMes?.toLocaleString('pt-BR') ?? '-'}</StatValue>
+                                  <StatLabel>Receitas do mês</StatLabel>
+                                </StatContent>
+                              </HighlightCard>
+                              <HighlightCard onClick={() => window.location.href = '/pessoas?filter=birthdays'} title="Clique para ver aniversariantes">
+                                <StatIcon bgColor={theme.colors.warning} aria-label="Aniversariantes hoje">🎂</StatIcon>
+                                <StatContent>
+                                  <StatValue>{stats.aniversariantesHoje ?? '-'}</StatValue>
+                                  <StatLabel>Aniversariantes hoje</StatLabel>
+                                </StatContent>
+                              </HighlightCard>
+                            </StatsGrid>
+                          </>
+                        )}
+                        {widget === 'finance' && widgets.includes('finance') && (
+                          <>
+                            {userRole === 'tesoureiro' && <TreasurerWidget />}
+                            <ChartsGrid>
+                              <Card>
+                                <CardHeader>
+                                  <h3>Movimentação Financeira</h3>
+                                  <select value={period} onChange={e => setPeriod(e.target.value as any)} style={{ marginLeft: 16 }}>
+                                    <option value="month">Mensal</option>
+                                    <option value="quarter">Trimestral</option>
+                                    <option value="year">Anual</option>
+                                  </select>
+                                </CardHeader>
+                                <CardBody>
+                                  {financialData.length === 0 ? (
+                                    <EmptyState
+                                      icon="💰"
+                                      title="Nenhum dado financeiro disponível"
+                                      description="Adicione lançamentos de receitas e despesas para acompanhar o fluxo financeiro da igreja e tomar decisões baseadas em dados."
+                                      actionText="Ir para Financeiro"
+                                      actionLink="/financeiro"
+                                    />
+                                  ) : (
+                                    <TransformWrapper
+                                      wheel={{ step: 0.1 }}
+                                      pinch={{ step: 5 }}
+                                      doubleClick={{ disabled: true }}
+                                      minScale={1}
+                                      maxScale={4}
+                                    >
+                                      {({ zoomIn, zoomOut, resetTransform }) => (
+                                        <div style={{ position: 'relative' }}>
+                                          <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 2, display: 'flex', gap: 4 }}>
+                                            <button onClick={zoomIn} aria-label="Zoom in">+</button>
+                                            <button onClick={zoomOut} aria-label="Zoom out">-</button>
+                                            <button onClick={resetTransform} aria-label="Resetar zoom">⟳</button>
+                                          </div>
+                                          <TransformComponent>
+                                            <ResponsiveContainer width="100%" height={300}>
+                                              <BarChart
+                                                data={financialData}
+                                                onClick={data => setDrilldownData(data.activePayload?.[0]?.payload)}
+                                                margin={{ top: 16, right: 16, left: 0, bottom: 0 }}
+                                              >
+                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <XAxis dataKey="month" allowDataOverflow={true} />
+                                                <YAxis allowDataOverflow={true} />
+                                                <Tooltip formatter={(value) => `R$ ${value}`} />
+                                                <Legend />
+                                                <Bar dataKey="receitas" name="Receitas" fill={theme.colors.primary} />
+                                                <Bar dataKey="despesas" name="Despesas" fill={theme.colors.danger} />
+                                              </BarChart>
+                                            </ResponsiveContainer>
+                                          </TransformComponent>
                                         </div>
                                       )}
-                                    </CardBody>
-                                  </Card>
-                                </ChartsGrid>
-                              </>
-                            )}
-                            {widget === 'members' && widgets.includes('members') && (
-                              <>
-                                {/* Widget especializado para líderes */}
-                                {(userRole === 'lider' || userRole === 'pastor') && <LeaderWidget />}
-                                
+                                    </TransformWrapper>
+                                  )}
+                                  {drilldownData && (
+                                    <div style={{ marginTop: 16, background: theme.colors.grayLight, padding: 16, borderRadius: 8 }}>
+                                      <b>Detalhes de {drilldownData.month}:</b><br />
+                                      Receitas: R$ {drilldownData.receitas?.toLocaleString('pt-BR')}<br />
+                                      Despesas: R$ {drilldownData.despesas?.toLocaleString('pt-BR')}<br />
+                                      Saldo: R$ {drilldownData.saldo?.toLocaleString('pt-BR')}<br />
+                                      <button onClick={() => setDrilldownData(null)} style={{ marginTop: 8 }}>Fechar</button>
+                                    </div>
+                                  )}
+                                </CardBody>
+                              </Card>
+                            </ChartsGrid>
+                          </>
+                        )}
+                        {widget === 'members' && widgets.includes('members') && (
+                          <>
+                            {(userRole === 'lider' || userRole === 'pastor') && <LeaderWidget />}
+                            <ChartsGrid>
+                              <Card>
+                                <CardHeader>
+                                  <h3>
+                                    <a href="/pessoas" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                      Distribuição de Membros
+                                    </a>
+                                  </h3>
+                                </CardHeader>
+                                <CardBody>
+                                  <MembersDistributionChart data={memberData} />
+                                </CardBody>
+                              </Card>
+                            </ChartsGrid>
+                          </>
+                        )}
+                        {widget === 'events' && widgets.includes('events') && (
+                          <ChartsGrid>
+                            <Card>
+                              <CardHeader>
+                                <h3>
+                                  <a href="/agenda" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    Timeline de Eventos
+                                  </a>
+                                </h3>
+                              </CardHeader>
+                              <CardBody>
+                                <EventsTimelineChart events={upcomingEvents} />
+                              </CardBody>
+                            </Card>
+                          </ChartsGrid>
+                        )}
+                      </div>
+                    ))}
+                  {/* Indicador de página atual */}
+                  <div style={{ textAlign: 'center', marginTop: 8 }}>
+                    {widgetOrder
+                      .filter(widget => essentialWidgetsMobile.includes(widget as any))
+                      .map((_, idx) => (
+                        <span key={idx} style={{
+                          display: 'inline-block',
+                          width: 10,
+                          height: 10,
+                          borderRadius: '50%',
+                          background: idx === mobileWidgetIndex ? theme.colors.primary : theme.colors.gray,
+                          margin: '0 4px',
+                        }} />
+                      ))}
+                  </div>
+                </div>
+              </PullToRefresh>
+            ) : (
+              // Desktop: renderização padrão com drag-and-drop
+              <DragDropContext onDragEnd={handleDragEnd}>
+                <Droppable droppableId="dashboard-widgets" direction="vertical">
+                  {(provided: DroppableProvided) => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                      {widgetOrder.map((widget, idx) => (
+                        <Draggable key={widget} draggableId={widget} index={idx}>
+                          {(dragProvided: DraggableProvided) => (
+                            <div
+                              ref={dragProvided.innerRef}
+                              {...dragProvided.draggableProps}
+                              {...dragProvided.dragHandleProps}
+                              style={{ marginBottom: 24, ...dragProvided.draggableProps.style }}
+                            >
+                              {widget === 'notifications' && widgets.includes('notifications') && <NotificationWidget />}
+                              {widget === 'stats' && widgets.includes('stats') && (
+                                <>
+                                  {/* Widgets específicos por função */}
+                                  {userRole === 'admin' && <AdminWidget />}
+                                  {userRole === 'pastor' && <PastorWidget />}
+                                  {userRole === 'membro' && <MemberInfoWidget />}
+                                  {userRole === 'voluntario' && <VolunteerWidget />}
+                                  <StatsGrid>
+                                    <HighlightCard onClick={() => window.location.href = '/pessoas'} title="Clique para ver todos os membros">
+                                      <StatIcon bgColor={theme.colors.primary} aria-label="Membros ativos">👥</StatIcon>
+                                      <StatContent>
+                                        <StatValue>{stats.pessoasAtivas ?? '-'}</StatValue>
+                                        <StatLabel>Membros ativos</StatLabel>
+                                      </StatContent>
+                                    </HighlightCard>
+                                    <HighlightCard onClick={() => window.location.href = '/grupos'} title="Clique para ver todos os grupos">
+                                      <StatIcon bgColor={theme.colors.info} aria-label="Grupos ativos">👨‍👩‍👧‍👦</StatIcon>
+                                      <StatContent>
+                                        <StatValue>{stats.gruposAtivos ?? '-'}</StatValue>
+                                        <StatLabel>Grupos ativos</StatLabel>
+                                      </StatContent>
+                                    </HighlightCard>
+                                    <HighlightCard onClick={() => window.location.href = '/financeiro'} title="Clique para ver movimentação financeira">
+                                      <StatIcon bgColor={theme.colors.success} aria-label="Receitas do mês">💰</StatIcon>
+                                      <StatContent>
+                                        <StatValue>R$ {stats.receitasMes?.toLocaleString('pt-BR') ?? '-'}</StatValue>
+                                        <StatLabel>Receitas do mês</StatLabel>
+                                      </StatContent>
+                                    </HighlightCard>
+                                    <HighlightCard onClick={() => window.location.href = '/pessoas?filter=birthdays'} title="Clique para ver aniversariantes">
+                                      <StatIcon bgColor={theme.colors.warning} aria-label="Aniversariantes hoje">🎂</StatIcon>
+                                      <StatContent>
+                                        <StatValue>{stats.aniversariantesHoje ?? '-'}</StatValue>
+                                        <StatLabel>Aniversariantes hoje</StatLabel>
+                                      </StatContent>
+                                    </HighlightCard>
+                                  </StatsGrid>
+                                </>
+                              )}
+                              {widget === 'finance' && widgets.includes('finance') && (
+                                <>
+                                  {/* Widget especializado para tesoureiro */}
+                                  {userRole === 'tesoureiro' && <TreasurerWidget />}
+                                  <ChartsGrid>
+                                    <Card>
+                                      <CardHeader>
+                                        <h3>Movimentação Financeira</h3>
+                                        <select value={period} onChange={e => setPeriod(e.target.value as any)} style={{ marginLeft: 16 }}>
+                                          <option value="month">Mensal</option>
+                                          <option value="quarter">Trimestral</option>
+                                          <option value="year">Anual</option>
+                                        </select>
+                                      </CardHeader>
+                                      <CardBody>
+                                        {financialData.length === 0 ? (
+                                          <EmptyState
+                                            icon="💰"
+                                            title="Nenhum dado financeiro disponível"
+                                            description="Adicione lançamentos de receitas e despesas para acompanhar o fluxo financeiro da igreja e tomar decisões baseadas em dados."
+                                            actionText="Ir para Financeiro"
+                                            actionLink="/financeiro"
+                                          />
+                                        ) : (
+                                          <TransformWrapper
+                                            wheel={{ step: 0.1 }}
+                                            pinch={{ step: 5 }}
+                                            doubleClick={{ disabled: true }}
+                                            minScale={1}
+                                            maxScale={4}
+                                          >
+                                            {({ zoomIn, zoomOut, resetTransform }) => (
+                                              <div style={{ position: 'relative' }}>
+                                                <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 2, display: 'flex', gap: 4 }}>
+                                                  <button onClick={zoomIn} aria-label="Zoom in">+</button>
+                                                  <button onClick={zoomOut} aria-label="Zoom out">-</button>
+                                                  <button onClick={resetTransform} aria-label="Resetar zoom">⟳</button>
+                                                </div>
+                                                <TransformComponent>
+                                                  <ResponsiveContainer width="100%" height={300}>
+                                                    <BarChart
+                                                      data={financialData}
+                                                      onClick={data => setDrilldownData(data.activePayload?.[0]?.payload)}
+                                                      margin={{ top: 16, right: 16, left: 0, bottom: 0 }}
+                                                    >
+                                                      <CartesianGrid strokeDasharray="3 3" />
+                                                      <XAxis dataKey="month" allowDataOverflow={true} />
+                                                      <YAxis allowDataOverflow={true} />
+                                                      <Tooltip formatter={(value) => `R$ ${value}`} />
+                                                      <Legend />
+                                                      <Bar dataKey="receitas" name="Receitas" fill={theme.colors.primary} />
+                                                      <Bar dataKey="despesas" name="Despesas" fill={theme.colors.danger} />
+                                                    </BarChart>
+                                                  </ResponsiveContainer>
+                                                </TransformComponent>
+                                              </div>
+                                            )}
+                                          </TransformWrapper>
+                                        )}
+                                        {drilldownData && (
+                                          <div style={{ marginTop: 16, background: theme.colors.grayLight, padding: 16, borderRadius: 8 }}>
+                                            <b>Detalhes de {drilldownData.month}:</b><br />
+                                            Receitas: R$ {drilldownData.receitas?.toLocaleString('pt-BR')}<br />
+                                            Despesas: R$ {drilldownData.despesas?.toLocaleString('pt-BR')}<br />
+                                            Saldo: R$ {drilldownData.saldo?.toLocaleString('pt-BR')}<br />
+                                            <button onClick={() => setDrilldownData(null)} style={{ marginTop: 8 }}>Fechar</button>
+                                          </div>
+                                        )}
+                                      </CardBody>
+                                    </Card>
+                                  </ChartsGrid>
+                                </>
+                              )}
+                              {widget === 'members' && widgets.includes('members') && (
+                                <>
+                                  {(userRole === 'lider' || userRole === 'pastor') && <LeaderWidget />}
+                                  <ChartsGrid>
+                                    <Card>
+                                      <CardHeader>
+                                        <h3>
+                                          <a href="/pessoas" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            Distribuição de Membros
+                                          </a>
+                                        </h3>
+                                      </CardHeader>
+                                      <CardBody>
+                                        <MembersDistributionChart data={memberData} />
+                                      </CardBody>
+                                    </Card>
+                                  </ChartsGrid>
+                                </>
+                              )}
+                              {widget === 'events' && widgets.includes('events') && (
                                 <ChartsGrid>
                                   <Card>
                                     <CardHeader>
                                       <h3>
-                                        <a href="/pessoas" style={{ textDecoration: 'none', color: 'inherit' }}>
-                                          Distribuição de Membros
+                                        <a href="/agenda" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                          Timeline de Eventos
                                         </a>
                                       </h3>
                                     </CardHeader>
                                     <CardBody>
-                                      <MembersDistributionChart data={memberData} />
+                                      <EventsTimelineChart events={upcomingEvents} />
                                     </CardBody>
                                   </Card>
                                 </ChartsGrid>
-                              </>
-                            )}
-                            {widget === 'events' && widgets.includes('events') && (
-                              <ChartsGrid>
-                                <Card>
-                                  <CardHeader>
-                                    <h3>
-                                      <a href="/agenda" style={{ textDecoration: 'none', color: 'inherit' }}>
-                                        Timeline de Eventos
-                                      </a>
-                                    </h3>
-                                  </CardHeader>
-                                  <CardBody>
-                                    <EventsTimelineChart events={upcomingEvents} />
-                                  </CardBody>
-                                </Card>
-                              </ChartsGrid>
-                            )}
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
+                              )}
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
+            )}
             
             {/* Tabelas */}
             <TableGrid>
@@ -617,7 +913,9 @@ const DashboardPage: React.FC = () => {
                   </h3>
                 </CardHeader>
                 <CardBody>
-                  <UpcomingEventsTable events={upcomingEvents} />
+                  <TableWrapper>
+                    <UpcomingEventsTable events={isMobile ? upcomingEvents.slice(0, maxItemsMobile) : upcomingEvents} />
+                  </TableWrapper>
                 </CardBody>
               </Card>
               <Card>
@@ -629,7 +927,9 @@ const DashboardPage: React.FC = () => {
                   </h3>
                 </CardHeader>
                 <CardBody>
-                  <BirthdayTable people={birthdayPeople} />
+                  <TableWrapper>
+                    <BirthdayTable people={isMobile ? birthdayPeople.slice(0, maxItemsMobile) : birthdayPeople} />
+                  </TableWrapper>
                 </CardBody>
               </Card>
             </TableGrid>
@@ -638,7 +938,9 @@ const DashboardPage: React.FC = () => {
                 <h3>Atividades Recentes</h3>
               </CardHeader>
               <CardBody>
-                <RecentActivitiesTable activities={dashboardData?.recentActivities || []} />
+                <TableWrapper>
+                  <RecentActivitiesTable activities={isMobile ? (dashboardData?.recentActivities || []).slice(0, maxItemsMobile).map(mapRecentActivityToActivity) : (dashboardData?.recentActivities || []).map(mapRecentActivityToActivity)} />
+                </TableWrapper>
               </CardBody>
             </Card>
           </DashboardContainer>

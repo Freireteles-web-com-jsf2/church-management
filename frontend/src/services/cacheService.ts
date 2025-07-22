@@ -8,6 +8,8 @@
  * - Compressão de dados (para grandes conjuntos)
  */
 
+import LZString from 'lz-string';
+
 interface CacheItem<T> {
   data: T;
   timestamp: number;
@@ -30,17 +32,16 @@ const CACHE_KEYS_KEY = 'dashboard_cache_keys';
  * Nota: Em uma implementação real, usaríamos uma biblioteca como lz-string
  */
 const compressData = (data: any): string => {
-  // Simulação de compressão - em produção usaríamos LZString ou similar
-  return JSON.stringify(data);
+  return LZString.compressToUTF16(JSON.stringify(data));
 };
 
 /**
  * Descomprime dados
  */
 const decompressData = (compressed: string): any => {
-  // Simulação de descompressão
   try {
-    return JSON.parse(compressed);
+    const json = LZString.decompressFromUTF16(compressed);
+    return JSON.parse(json!);
   } catch (e) {
     return null;
   }

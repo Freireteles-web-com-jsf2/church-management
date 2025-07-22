@@ -134,7 +134,9 @@ const UserRole = styled.span`
   color: ${theme.colors.textLight};
 `;
 
-const UserDropdown = styled.div<{ isOpen: boolean }>`
+const UserDropdown = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isOpen',
+})<{ isOpen: boolean }>`
   position: absolute;
   top: calc(100% + 8px);
   right: 0;

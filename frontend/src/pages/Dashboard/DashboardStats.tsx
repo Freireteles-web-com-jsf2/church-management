@@ -200,10 +200,27 @@ const DashboardStats: React.FC = () => {
     fetchDashboardStats();
   }, []);
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('church_session');
+    if (token) {
+      try {
+        const sessionData = JSON.parse(token);
+        return {
+          'Authorization': `Bearer ${sessionData.token}`,
+          'Content-Type': 'application/json'
+        };
+      } catch {
+        return { 'Content-Type': 'application/json' };
+      }
+    }
+    return { 'Content-Type': 'application/json' };
+  };
+
   const fetchDashboardStats = async () => {
     try {
-      setLoading(true);
-      const response = await axios.get('http://localhost:4000/api/dashboard/stats');
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/dashboard/stats`, {
+        headers: getAuthHeaders()
+      });
       setStats(response.data);
       setError(null);
     } catch (err) {

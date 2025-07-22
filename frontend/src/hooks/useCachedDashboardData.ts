@@ -100,7 +100,27 @@ export function useCachedDashboardData(
   // Chave de cache baseada no período
   const cacheKey = `dashboard_data_${period}`;
 
-  // Função para buscar dados da API
+  // Função para buscar apenas dados prioritários (stats e notificações)
+  const fetchPriorityData = useCallback(async (): Promise<Partial<DashboardData>> => {
+    try {
+      const response = await axios.get('/api/dashboard/priority', { params: { period } });
+      return response.data;
+    } catch (err) {
+      return {};
+    }
+  }, [period]);
+
+  // Função para buscar dados secundários (gráficos, listas)
+  const fetchSecondaryData = useCallback(async (): Promise<Partial<DashboardData>> => {
+    try {
+      const response = await axios.get('/api/dashboard/secondary', { params: { period } });
+      return response.data;
+    } catch (err) {
+      return {};
+    }
+  }, [period]);
+
+  // Função para buscar dados completos (fallback)
   const fetchFromApi = useCallback(async (): Promise<DashboardData | null> => {
     try {
       const response = await axios.get('/api/dashboard/all', { params: { period } });
@@ -113,10 +133,10 @@ export function useCachedDashboardData(
     }
   }, [period]);
 
-  // Função para buscar dados com cache
+  // Função para buscar dados com carregamento por prioridade
   const fetchData = useCallback(async (forceRefresh = false): Promise<DashboardData | null> => {
     setLoading(true);
-    
+    let partialData: Partial<DashboardData> = {};
     try {
       // Verifica se há dados em cache e se não é uma atualização forçada
       if (!forceRefresh) {
@@ -130,40 +150,46 @@ export function useCachedDashboardData(
           return cachedData;
         }
       }
-      
-      // Se não há cache ou é refresh forçado, busca da API
-      const apiData = await fetchFromApi();
-      
-      // Armazena no cache
-      dashboardCache.set(cacheKey, apiData, {
-        ttl,
-        persistOffline,
-        compress: true // Comprime dados grandes
+
+      // 1. Buscar dados prioritários primeiro
+      partialData = await fetchPriorityData();
+      setData(prev => ({ ...prev, ...partialData } as DashboardData));
+      setLoading(true); // Loading parcial
+
+      // 2. Buscar dados secundários em background
+      fetchSecondaryData().then(secondaryData => {
+        const merged = { ...partialData, ...secondaryData } as DashboardData;
+        setData(merged);
+        dashboardCache.set(cacheKey, merged, {
+          ttl,
+          persistOffline,
+          compress: true
+        });
+        setLoading(false);
+        setError(null);
+        setLastUpdate(new Date());
+        setIsStale(false);
+      }).catch(() => {
+        setLoading(false);
       });
-      
-      setData(apiData);
-      setError(null);
-      setLastUpdate(new Date());
-      setIsStale(false);
-      
-      return apiData;
+
+      // Retorna dados parciais imediatamente
+      return { ...partialData } as DashboardData;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido ao buscar dados';
       setError(errorMessage);
-      
       // Tenta usar cache mesmo em caso de erro
       const cachedData = dashboardCache.get<DashboardData>(cacheKey);
       if (cachedData) {
         setData(cachedData);
-        setIsStale(true); // Marca como potencialmente desatualizado
+        setIsStale(true);
         return cachedData;
       }
-      
       return null;
     } finally {
-      setLoading(false);
+      // O loading total será atualizado pelo fetchSecondaryData
     }
-  }, [cacheKey, period, ttl, persistOffline]);
+  }, [cacheKey, period, ttl, persistOffline, fetchPriorityData, fetchSecondaryData]);
 
   // Função para forçar atualização
   const refetch = useCallback(async (): Promise<DashboardData | null> => {

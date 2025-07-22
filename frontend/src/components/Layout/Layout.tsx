@@ -14,7 +14,9 @@ const LayoutContainer = styled.div`
   background-color: ${theme.colors.background};
 `;
 
-const MainContent = styled.main<{ isSidebarCollapsed: boolean }>`
+const MainContent = styled.main.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isSidebarCollapsed',
+})<{ isSidebarCollapsed: boolean }>`
   flex: 1;
   margin-left: ${({ isSidebarCollapsed }) => (isSidebarCollapsed ? '80px' : '280px')};
   transition: margin-left ${theme.transitions.normal};
